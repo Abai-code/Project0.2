@@ -4,6 +4,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import MovieCard from "../components/MovieCard";
 import HeroSlider from "../components/HeroSlider";
 import LatestComments from "../components/LatestComments";
+import { useTranslation } from "react-i18next";
 
 const FilterAccordion = ({ title, children, defaultOpen = false }) => (
   <details className="group mb-[2px] overflow-hidden bg-[#3a3a3a] first:rounded-t-lg last:rounded-b-lg shadow-sm" open={defaultOpen}>
@@ -44,6 +45,7 @@ export default function HomePage() {
   const [sort, setSort] = useState("new");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const { t } = useTranslation();
 
   useEffect(() => {
     client
@@ -67,7 +69,7 @@ export default function HomePage() {
           }
         })
         .then((res) => setMovies(res.data))
-        .catch(() => setError("Не удалось загрузить фильмы"))
+        .catch(() => setError(t("catalog.loadError")))
         .finally(() => setLoading(false));
     }, 300);
 
@@ -79,21 +81,21 @@ export default function HomePage() {
       <HeroSlider />
       
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-bold">Каталог фильмов</h1>
+        <h1 className="text-2xl font-bold">{t("catalog.title")}</h1>
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value)}
             className="rounded border border-slate-700 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-red-500"
           >
-            <option value="new">Сначала новые</option>
-            <option value="old">Сначала старые</option>
-            <option value="rating">По рейтингу</option>
+            <option value="new">{t("catalog.sortNew")}</option>
+            <option value="old">{t("catalog.sortOld")}</option>
+            <option value="rating">{t("catalog.sortRating")}</option>
           </select>
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Live search по названию..."
+            placeholder={t("catalog.search")}
             className="w-full rounded border border-slate-700 bg-slate-900 px-4 py-2 outline-none focus:border-red-500 sm:w-80"
           />
         </div>
@@ -104,12 +106,12 @@ export default function HomePage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
         <aside className="lg:col-span-3">
           <div className="flex flex-col overflow-hidden rounded-lg bg-[#343434] shadow-lg border border-[#3a3a3a]">
-            <FilterAccordion title="Фильмы / Категории" defaultOpen>
+            <FilterAccordion title={t("catalog.categories")} defaultOpen>
               <div className="flex flex-col gap-1">
                 <FilterButton
                   onClick={() => setSelected((p) => ({ ...p, genre: "" }))}
                   active={selected.genre === ""}
-                  label="Все фильмы"
+                  label={t("catalog.all")}
                   count={filters.genres.reduce((acc, g) => acc + g.count, 0) || undefined}
                 />
                 <div className="mt-1 grid grid-cols-2 gap-1">
@@ -118,7 +120,7 @@ export default function HomePage() {
                       key={g.genre}
                       onClick={() => setSelected((p) => ({ ...p, genre: g.genre }))}
                       active={selected.genre === g.genre}
-                      label={g.genre}
+                      label={t(`genres.${g.genre.trim()}`, { defaultValue: g.genre })}
                       count={g.count}
                     />
                   ))}
@@ -126,12 +128,12 @@ export default function HomePage() {
               </div>
             </FilterAccordion>
 
-            <FilterAccordion title="По году">
+            <FilterAccordion title={t("catalog.byYear")}>
               <div className="flex flex-col gap-1">
                 <FilterButton
                   onClick={() => setSelected((p) => ({ ...p, year: "" }))}
                   active={selected.year === ""}
-                  label="Все года"
+                  label={t("catalog.all")}
                   centered
                 />
                 <div className="grid grid-cols-3 gap-1">
@@ -148,12 +150,12 @@ export default function HomePage() {
               </div>
             </FilterAccordion>
 
-            <FilterAccordion title="По странам">
+            <FilterAccordion title={t("movie.country")}>
               <div className="flex flex-col gap-1">
                 <FilterButton
                   onClick={() => setSelected((p) => ({ ...p, country: "" }))}
                   active={selected.country === ""}
-                  label="Все страны"
+                  label={t("catalog.all")}
                 />
                 <div className="grid grid-cols-2 gap-1">
                   {filters.countries.slice(0, 10).map((c) => (
@@ -161,29 +163,29 @@ export default function HomePage() {
                       key={c.country}
                       onClick={() => setSelected((p) => ({ ...p, country: c.country }))}
                       active={selected.country === c.country}
-                      label={c.country}
+                      label={t(`countries.${c.country.trim()}`, { defaultValue: c.country })}
                     />
                   ))}
                 </div>
               </div>
             </FilterAccordion>
 
-            <FilterAccordion title="Сериалы">
+            <FilterAccordion title={t("movie.type")}>
               <div className="flex flex-col gap-1">
                 <FilterButton
                   onClick={() => setSelected((p) => ({ ...p, isSeries: "" }))}
                   active={selected.isSeries === ""}
-                  label="Все видео"
+                  label={t("catalog.all")}
                 />
                 <FilterButton
                   onClick={() => setSelected((p) => ({ ...p, isSeries: "true" }))}
                   active={selected.isSeries === "true"}
-                  label="Только сериалы"
+                  label={t("movie.series")}
                 />
                 <FilterButton
                   onClick={() => setSelected((p) => ({ ...p, isSeries: "false" }))}
                   active={selected.isSeries === "false"}
-                  label="Только фильмы"
+                  label={t("movie.film")}
                 />
               </div>
             </FilterAccordion>
@@ -194,7 +196,7 @@ export default function HomePage() {
             onClick={() => setSelected({ year: "", country: "", genre: "", isSeries: "" })}
             className="mt-4 w-full rounded border border-slate-700 bg-slate-900 px-4 py-2 text-sm text-slate-300 transition-colors hover:bg-slate-800 hover:text-white shadow-md mb-8"
           >
-            Сбросить фильтры
+            {t("admin.reset")}
           </button>
 
           <LatestComments />
@@ -204,7 +206,7 @@ export default function HomePage() {
           {loading ? (
             <div className="flex justify-center p-10"><LoadingSpinner /></div>
           ) : movies.length === 0 ? (
-            <div className="text-center py-10 text-slate-500 italic">Фильмы не найдены</div>
+            <div className="text-center py-10 text-slate-500 italic">{t("catalog.noMovies")}</div>
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {movies.map((movie) => (

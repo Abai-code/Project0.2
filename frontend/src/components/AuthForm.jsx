@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+﻿import { Link } from "react-router-dom";
 
 const baseInputClass =
   "w-full rounded border border-slate-700 bg-slate-950 p-3 outline-none focus:border-red-500";
@@ -21,15 +21,18 @@ export default function AuthForm({
       <h1 className="mb-4 text-2xl font-bold">{title}</h1>
       <form onSubmit={onSubmit} className="space-y-4">
         {fields.map((field) => (
-          <input
-            key={field.name}
-            name={field.name}
-            type={field.type}
-            placeholder={field.placeholder}
-            value={field.value}
-            onChange={onChange}
-            className={baseInputClass}
-          />
+          <label key={field.name} className="block space-y-1">
+            <span className="text-sm text-slate-300">{field.label || field.placeholder}</span>
+            <input
+              name={field.name}
+              type={field.type}
+              placeholder={field.placeholder}
+              value={field.value}
+              onChange={onChange}
+              className={baseInputClass}
+              aria-label={field.label || field.placeholder}
+            />
+          </label>
         ))}
         {error && <p className="text-sm text-red-400">{error}</p>}
         <button

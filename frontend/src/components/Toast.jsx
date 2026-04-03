@@ -1,4 +1,4 @@
-export default function Toast({ message, type = "success" }) {
+﻿export default function Toast({ message, type = "success" }) {
   if (!message) {
     return null;
   }
@@ -9,7 +9,11 @@ export default function Toast({ message, type = "success" }) {
       : "bg-emerald-600/90 border-emerald-400";
 
   return (
-    <div className={`fixed right-4 top-20 z-30 rounded border px-4 py-2 text-white shadow ${colors}`}>
+    <div
+      className={`fixed right-4 top-20 z-30 rounded border px-4 py-2 text-white shadow ${colors}`}
+      role={type === "error" ? "alert" : "status"}
+      aria-live="polite"
+    >
       {message}
     </div>
   );

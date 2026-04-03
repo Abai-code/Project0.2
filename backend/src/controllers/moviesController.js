@@ -1,4 +1,4 @@
-const { validationResult } = require("express-validator");
+﻿const { validationResult } = require("express-validator");
 const db = require("../db");
 const fs = require("fs");
 const path = require("path");
@@ -6,27 +6,37 @@ const path = require("path");
 const MOVIE_SELECT_FIELDS =
   "id, title, description, image, movie_url, year, country, genre, is_series, rating, featured, created_at";
 
+function parseBoolean(value) {
+  if (typeof value === "boolean") {
+    return value;
+  }
+  if (typeof value === "string") {
+    return value.toLowerCase() === "true";
+  }
+  return false;
+}
+
 function getValidationError(req, res) {
   const errors = validationResult(req);
   if (errors.isEmpty()) {
     return null;
   }
 
-  return res.status(400).json({ message: "Ошибка валидации", errors: errors.array() });
+  return res.status(400).json({ message: "Validation error", errors: errors.array() });
 }
 
 function normalizeMoviePayload(body) {
   return {
-    title: body.title,
-    description: body.description,
-    image: body.image,
-    movie_url: body.movie_url ?? null,
-    year: body.year ?? null,
-    country: body.country ?? null,
-    genre: body.genre ?? null,
-    is_series: Boolean(body.is_series),
+    title: body.title?.trim(),
+    description: body.description?.trim(),
+    image: body.image?.trim(),
+    movie_url: body.movie_url?.trim() || null,
+    year: body.year === null || body.year === undefined || body.year === "" ? null : Number(body.year),
+    country: body.country?.trim() || null,
+    genre: body.genre?.trim() || null,
+    is_series: parseBoolean(body.is_series),
     rating: Number(body.rating) || 0,
-    featured: Boolean(body.featured),
+    featured: parseBoolean(body.featured),
   };
 }
 
@@ -34,67 +44,85 @@ async function getMovies(req, res) {
   try {
     const { search = "", year, country, genre, isSeries, sort = "new" } = req.query;
 
-    const where = ["LOWER(title) LIKE LOWER($1)"];
+    const where = ["LOWER(m.title) LIKE LOWER($1)"];
     const params = [`%${search}%`];
     let idx = 2;
 
     if (year) {
-      where.push(`year = $${idx++}`);
+      where.push(`m.year = $${idx++}`);
       params.push(Number(year));
     }
     if (country) {
-      where.push(`country = $${idx++}`);
+      where.push(`m.country = $${idx++}`);
       params.push(country);
     }
     if (genre) {
-      where.push(`genre = $${idx++}`);
+      where.push(`m.genre = $${idx++}`);
       params.push(genre);
     }
     if (typeof isSeries !== "undefined" && isSeries !== "") {
-      where.push(`is_series = $${idx++}`);
+      where.push(`m.is_series = $${idx++}`);
       params.push(isSeries === "true" || isSeries === true);
     }
 
     const orderBy =
       sort === "rating"
-        ? "rating DESC, created_at DESC"
+        ? "m.rating DESC, m.created_at DESC"
         : sort === "old"
-          ? "created_at ASC"
-          : "created_at DESC";
+          ? "m.created_at ASC"
+          : "m.created_at DESC";
+
+    const currentUserId = req.user?.id || 0;
 
     const result = await db.query(
-      `SELECT ${MOVIE_SELECT_FIELDS}
-       FROM movies
+      `SELECT m.*, 
+              (f.id IS NOT NULL) as is_favorite
+       FROM movies m
+       LEFT JOIN favorites f ON m.id = f.movie_id AND f.user_id = $${idx}
        WHERE ${where.join(" AND ")}
        ORDER BY ${orderBy}`,
-      params
+      [...params, currentUserId]
     );
     return res.json(result.rows);
   } catch (error) {
-    return res.status(500).json({ message: "Ошибка получения фильмов" });
+    console.error("Get movies error details:", error);
+    return res.status(500).json({ message: "Failed to load movies", detail: error.message });
   }
 }
 
 async function getMovieById(req, res) {
   try {
-    const result = await db.query(`SELECT ${MOVIE_SELECT_FIELDS} FROM movies WHERE id = $1`, [req.params.id]);
+    const currentUserId = req.user?.id || 0;
+    const result = await db.query(
+      `SELECT m.*, (f.id IS NOT NULL) as is_favorite 
+       FROM movies m
+       LEFT JOIN favorites f ON m.id = f.movie_id AND f.user_id = $2
+       WHERE m.id = $1`,
+      [req.params.id, currentUserId]
+    );
     if (result.rowCount === 0) {
-      return res.status(404).json({ message: "Фильм не найден" });
+      return res.status(404).json({ message: "Movie not found" });
     }
     return res.json(result.rows[0]);
   } catch (error) {
-    return res.status(500).json({ message: "Ошибка получения фильма" });
+    return res.status(500).json({ message: "Failed to load movie" });
   }
 }
 
 async function getFeaturedMovies(req, res) {
   try {
+    const currentUserId = req.user?.id || 0;
     const result = await db.query(
-      `SELECT ${MOVIE_SELECT_FIELDS} FROM movies WHERE featured = TRUE ORDER BY created_at DESC LIMIT 7`
+      `SELECT m.*, (f.id IS NOT NULL) as is_favorite
+       FROM movies m
+       LEFT JOIN favorites f ON m.id = f.movie_id AND f.user_id = $1
+       WHERE m.featured = TRUE 
+       ORDER BY m.created_at DESC LIMIT 7`,
+      [currentUserId]
     );
     return res.json(result.rows);
   } catch (error) {
-    return res.status(500).json({ message: "Ошибка получения популярных фильмов" });
+    return res.status(500).json({ message: "Failed to load featured movies" });
   }
 }
 
@@ -115,7 +143,7 @@ async function createMovie(req, res) {
     return res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error("Create movie error:", error);
-    return res.status(500).json({ message: "Ошибка создания фильма" });
+    return res.status(500).json({ message: "Failed to create movie" });
   }
 }
 
@@ -135,12 +163,12 @@ async function updateMovie(req, res) {
       [movie.title, movie.description, movie.image, movie.movie_url, movie.year, movie.country, movie.genre, movie.is_series, movie.rating, movie.featured, req.params.id]
     );
     if (result.rowCount === 0) {
-      return res.status(404).json({ message: "Фильм не найден" });
+      return res.status(404).json({ message: "Movie not found" });
     }
     return res.json(result.rows[0]);
   } catch (error) {
     console.error("Update movie error:", error);
-    return res.status(500).json({ message: "Ошибка обновления фильма" });
+    return res.status(500).json({ message: "Failed to update movie" });
   }
 }
 
@@ -148,7 +176,7 @@ async function deleteMovie(req, res) {
   try {
     const movieRes = await db.query("SELECT id, movie_url FROM movies WHERE id = $1", [req.params.id]);
     if (movieRes.rowCount === 0) {
-      return res.status(404).json({ message: "Фильм не найден" });
+      return res.status(404).json({ message: "Movie not found" });
     }
 
     const movie = movieRes.rows[0];
@@ -159,17 +187,17 @@ async function deleteMovie(req, res) {
         try {
           fs.unlinkSync(filePath);
         } catch (err) {
-          console.error("Ошибка при удалении файла:", err);
+          console.error("File deletion error:", err);
         }
       }
     }
 
     await db.query("DELETE FROM movies WHERE id = $1", [req.params.id]);
 
-    return res.json({ message: "Фильм и связанный файл удалены" });
+    return res.json({ message: "Movie deleted successfully" });
   } catch (error) {
     console.error("Delete movie error:", error);
-    return res.status(500).json({ message: "Ошибка удаления фильма" });
+    return res.status(500).json({ message: "Failed to delete movie" });
   }
 }
 

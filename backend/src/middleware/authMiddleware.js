@@ -26,4 +26,18 @@ function requireAdmin(req, res, next) {
   return next();
 }
 
-module.exports = { requireAuth, requireAdmin };
+function optionalAuth(req, res, next) {
+  try {
+    const authHeader = req.headers.authorization || "";
+    const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+    if (token) {
+      const payload = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = payload;
+    }
+  } catch (error) {
+    // Игнорируем ошибки токена
+  }
+  next();
+}
+
+module.exports = { requireAuth, requireAdmin, optionalAuth };

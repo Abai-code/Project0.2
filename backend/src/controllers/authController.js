@@ -7,17 +7,15 @@ async function register(req, res) {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ message: "Ошибка валидации", errors: errors.array() });
+      return res.status(400).json({ message: "Validation error", errors: errors.array() });
     }
 
     const { username, email, password } = req.body;
-
-    // Проверка сложности пароля
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()\-_=+]).{8,}$/;
     if (!passwordRegex.test(password)) {
       return res.status(400).json({
         message:
-          "Пароль должен содержать минимум 8 символов, заглавную букву, строчную букву, цифру и специальный символ (!@#$%^&*)",
+          "Password must contain at least 8 characters, an uppercase letter, a lowercase letter, a digit, and a special character.",
       });
     }
 
@@ -26,7 +24,7 @@ async function register(req, res) {
       [email, username]
     );
     if (existing.rowCount > 0) {
-      return res.status(409).json({ message: "Пользователь уже существует" });
+      return res.status(409).json({ message: "User already exists" });
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
@@ -41,7 +39,7 @@ async function register(req, res) {
     const token = createToken(user);
     return res.status(201).json({ user, token });
   } catch (error) {
-    return res.status(500).json({ message: "Ошибка регистрации" });
+    return res.status(500).json({ message: "Registration failed" });
   }
 }
 
@@ -49,7 +47,7 @@ async function login(req, res) {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ message: "Ошибка валидации", errors: errors.array() });
+      return res.status(400).json({ message: "Validation error", errors: errors.array() });
     }
 
     const { email, password } = req.body;
@@ -59,20 +57,20 @@ async function login(req, res) {
     );
 
     if (result.rowCount === 0) {
-      return res.status(401).json({ message: "Неверные данные для входа" });
+      return res.status(401).json({ message: "Invalid email or password" });
     }
 
     const user = result.rows[0];
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Неверные данные для входа" });
+      return res.status(401).json({ message: "Invalid email or password" });
     }
 
     const token = createToken(user);
     delete user.password;
     return res.json({ user, token });
   } catch (error) {
-    return res.status(500).json({ message: "Ошибка входа" });
+    return res.status(500).json({ message: "Login failed" });
   }
 }
 
@@ -83,11 +81,11 @@ async function me(req, res) {
       [req.user.id]
     );
     if (result.rowCount === 0) {
-      return res.status(404).json({ message: "Пользователь не найден" });
+      return res.status(404).json({ message: "User not found" });
     }
     return res.json(result.rows[0]);
   } catch (error) {
-    return res.status(500).json({ message: "Ошибка получения профиля" });
+    return res.status(500).json({ message: "Failed to load profile" });
   }
 }
 

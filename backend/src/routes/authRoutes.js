@@ -1,4 +1,4 @@
-const express = require("express");
+﻿const express = require("express");
 const { body } = require("express-validator");
 const { login, me, register } = require("../controllers/authController");
 const { requireAuth } = require("../middleware/authMiddleware");
@@ -8,9 +8,9 @@ const router = express.Router();
 router.post(
   "/register",
   [
-    body("username").trim().isLength({ min: 3 }).withMessage("Минимум 3 символа"),
-    body("email").isEmail().withMessage("Некорректный email"),
-    body("password").isLength({ min: 6 }).withMessage("Минимум 6 символов")
+    body("username").trim().isLength({ min: 3 }).withMessage("Username must be at least 3 characters"),
+    body("email").isEmail().withMessage("Email must be valid"),
+    body("password").isLength({ min: 8 }).withMessage("Password must be at least 8 characters")
   ],
   register
 );
@@ -18,8 +18,8 @@ router.post(
 router.post(
   "/login",
   [
-    body("email").isEmail().withMessage("Некорректный email"),
-    body("password").notEmpty().withMessage("Введите пароль")
+    body("email").isEmail().withMessage("Email must be valid"),
+    body("password").notEmpty().withMessage("Password is required")
   ],
   login
 );

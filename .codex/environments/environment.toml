@@ -17,3 +17,11 @@ command = '''
 cd frontend
 npm run dev
 '''
+
+[[actions]]
+name = "f"
+icon = "tool"
+command = '''
+cd backend
+npm run dev
+'''

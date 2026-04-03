@@ -9,7 +9,7 @@ export function ThemeProvider({ children }) {
 
   useEffect(() => {
     localStorage.setItem("moviehub-theme", theme);
-    // Добавляем класс к тегу html для глобальной поддержки dark: классов
+    // Add class to html tag for global dark: support
     if (theme === "dark") {
       document.documentElement.classList.add("dark");
     } else {

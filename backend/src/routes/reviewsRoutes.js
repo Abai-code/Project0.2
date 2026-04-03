@@ -1,4 +1,4 @@
-const express = require("express");
+﻿const express = require("express");
 const { body } = require("express-validator");
 const {
   addReview,
@@ -14,9 +14,9 @@ router.post(
   "/",
   requireAuth,
   [
-    body("movieId").isInt({ min: 1 }).withMessage("Некорректный ID фильма"),
-    body("text").trim().notEmpty().withMessage("Отзыв не может быть пустым"),
-    body("rating").isInt({ min: 1, max: 10 }).withMessage("Оценка от 1 до 10")
+    body("movieId").isInt({ min: 1 }).withMessage("Movie ID must be valid"),
+    body("text").trim().isLength({ min: 3, max: 2000 }).withMessage("Review must be between 3 and 2000 characters"),
+    body("rating").isInt({ min: 1, max: 10 }).withMessage("Rating must be between 1 and 10")
   ],
   addReview
 );
