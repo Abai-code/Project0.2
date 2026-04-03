@@ -4,20 +4,35 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Toast from "./components/Toast";
 import { useAuth } from "./context/AuthContext";
+import { useTranslation } from "react-i18next";
 import AdminDashboard from "./pages/AdminDashboard";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import MoviePage from "./pages/MoviePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import RegisterPage from "./pages/RegisterPage";
+import FavoritesPage from "./pages/FavoritesPage";
 import WatchPage from "./pages/WatchPage";
 import ProfilePage from "./pages/ProfilePage";
 import { ThemeProvider } from "./context/ThemeContext";
 
+function AuthRoute({ children }) {
+  const { user, loading } = useAuth();
+  const { t } = useTranslation();
+  if (loading) {
+    return <p className="p-6 text-slate-400">{t("common.loading")}</p>;
+  }
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+}
+
 function AdminRoute({ children }) {
   const { user, isAdmin, loading } = useAuth();
+  const { t } = useTranslation();
   if (loading) {
-    return <p className="p-6 text-slate-400">Загрузка...</p>;
+    return <p className="p-6 text-slate-400">{t("common.loading")}</p>;
   }
   if (!user || !isAdmin) {
     return <Navigate to="/login" replace />;
@@ -49,6 +64,7 @@ export default function App() {
             <Route path="/login" element={<LoginPage setToast={setToast} />} />
             <Route path="/register" element={<RegisterPage setToast={setToast} />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/favorites" element={<AuthRoute><FavoritesPage /></AuthRoute>} />
             <Route
               path="/admin"
               element={
