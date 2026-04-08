@@ -4,7 +4,6 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Toast from "./components/Toast";
 import { useAuth } from "./context/AuthContext";
-import { useTranslation } from "react-i18next";
 import AdminDashboard from "./pages/AdminDashboard";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
@@ -18,9 +17,8 @@ import { ThemeProvider } from "./context/ThemeContext";
 
 function AuthRoute({ children }) {
   const { user, loading } = useAuth();
-  const { t } = useTranslation();
   if (loading) {
-    return <p className="p-6 text-slate-400">{t("common.loading")}</p>;
+    return <p className="p-6 text-slate-400">Загрузка...</p>;
   }
   if (!user) {
     return <Navigate to="/login" replace />;
@@ -30,9 +28,8 @@ function AuthRoute({ children }) {
 
 function AdminRoute({ children }) {
   const { user, isAdmin, loading } = useAuth();
-  const { t } = useTranslation();
   if (loading) {
-    return <p className="p-6 text-slate-400">{t("common.loading")}</p>;
+    return <p className="p-6 text-slate-400">Загрузка...</p>;
   }
   if (!user || !isAdmin) {
     return <Navigate to="/login" replace />;

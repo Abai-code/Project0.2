@@ -1,27 +1,25 @@
-﻿import { useMemo, useState } from "react";
+import { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import client from "../api/client";
 import { useAuth } from "../context/AuthContext";
 
 export default function RegisterPage({ setToast }) {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const { t } = useTranslation();
 
   const RULES = [
-    { id: "length", label: t("passwordRules.length"), test: (p) => p.length >= 8 },
-    { id: "upper", label: t("passwordRules.upper"), test: (p) => /[A-Z]/.test(p) },
-    { id: "lower", label: t("passwordRules.lower"), test: (p) => /[a-z]/.test(p) },
-    { id: "digit", label: t("passwordRules.digit"), test: (p) => /\d/.test(p) },
-    { id: "special", label: t("passwordRules.special"), test: (p) => /[@$!%*?&#^()\-_=+]/.test(p) },
+    { id: "length", label: "Минимум 8 символов", test: (p) => p.length >= 8 },
+    { id: "upper", label: "Заглавная буква (A-Z)", test: (p) => /[A-Z]/.test(p) },
+    { id: "lower", label: "Строчная буква (a-z)", test: (p) => /[a-z]/.test(p) },
+    { id: "digit", label: "Цифра (0-9)", test: (p) => /\d/.test(p) },
+    { id: "special", label: "Спецсимвол (!@#$%^&*)", test: (p) => /[@$!%*?&#^()\-_=+]/.test(p) },
   ];
 
   function getStrength(password, passedCount) {
     if (!password) return null;
-    if (passedCount <= 2) return { label: t("passwordRules.weak"), color: "bg-red-500", width: "w-1/3" };
-    if (passedCount <= 4) return { label: t("passwordRules.medium"), color: "bg-yellow-400", width: "w-2/3" };
-    return { label: t("passwordRules.strong"), color: "bg-green-500", width: "w-full" };
+    if (passedCount <= 2) return { label: "Слабый", color: "bg-red-500", width: "w-1/3" };
+    if (passedCount <= 4) return { label: "Средний", color: "bg-yellow-400", width: "w-2/3" };
+    return { label: "Сильный", color: "bg-green-500", width: "w-full" };
   }
 
   const [form, setForm] = useState({ username: "", email: "", password: "" });
@@ -46,11 +44,11 @@ export default function RegisterPage({ setToast }) {
   const onSubmit = async (e) => {
     e.preventDefault();
     if (!form.username || !form.email || !form.password) {
-      setError(t("auth.fillAll"));
+      setError("Заполните все поля");
       return;
     }
     if (!allPassed) {
-      setError(t("auth.passwordSafetyError"));
+      setError("Пароль не соответствует требованиям безопасности");
       return;
     }
     try {
@@ -58,10 +56,10 @@ export default function RegisterPage({ setToast }) {
       setError("");
       const res = await client.post("/auth/register", form);
       login(res.data);
-      setToast({ type: "success", message: t("auth.registerSuccess") });
+      setToast({ type: "success", message: "Регистрация выполнена" });
       navigate("/");
     } catch (e) {
-      setError(e.response?.data?.message || t("admin.loadError"));
+      setError(e.response?.data?.message || "Ошибка загрузки данных");
     } finally {
       setLoading(false);
     }
@@ -72,34 +70,34 @@ export default function RegisterPage({ setToast }) {
 
   return (
     <section className="mx-auto max-w-md rounded-xl border border-slate-800 bg-slate-900 p-6">
-      <h1 className="mb-6 text-2xl font-bold text-slate-100">{t("auth.registerTitle")}</h1>
+      <h1 className="mb-6 text-2xl font-bold text-slate-100">Создать аккаунт</h1>
 
       <form onSubmit={onSubmit} className="space-y-4">
         <input
           name="username"
           type="text"
-          placeholder={t("auth.username")}
+          placeholder="Имя пользователя"
           value={form.username}
           onChange={onChange}
           className={baseInput}
-          aria-label={t("auth.username")}
+          aria-label="Имя пользователя"
         />
 
         <input
           name="email"
           type="email"
-          placeholder={t("auth.email")}
+          placeholder="Email"
           value={form.email}
           onChange={onChange}
           className={baseInput}
-          aria-label={t("auth.email")}
+          aria-label="Email"
         />
 
         <div className="space-y-2">
           <input
             name="password"
             type="password"
-            placeholder={t("auth.password")}
+            placeholder="Пароль"
             value={form.password}
             onChange={onChange}
             className={`${baseInput} ${
@@ -109,7 +107,7 @@ export default function RegisterPage({ setToast }) {
                 ? "border-green-500"
                 : ""
             }`}
-            aria-label={t("auth.password")}
+            aria-label="Пароль"
           />
 
           {showRules && form.password && strength && (
@@ -122,9 +120,9 @@ export default function RegisterPage({ setToast }) {
                 </div>
                 <span
                   className={`text-xs font-bold ${
-                    strength.label === t("passwordRules.strong")
+                    strength.label === "Сильный"
                       ? "text-green-400"
-                      : strength.label === t("passwordRules.medium")
+                      : strength.label === "Средний"
                       ? "text-yellow-400"
                       : "text-red-400"
                   }`}
@@ -164,14 +162,14 @@ export default function RegisterPage({ setToast }) {
           disabled={loading}
           className="w-full rounded bg-red-600 py-2.5 font-semibold text-white transition-all hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-60 active:scale-95"
         >
-          {loading ? t("common.loading") : t("auth.registerBtn")}
+          {loading ? "Загрузка..." : "Зарегистрироваться"}
         </button>
       </form>
 
       <p className="mt-4 text-sm text-slate-400">
-        {t("auth.hasAccount")}{" "}
+        Уже есть аккаунт?{" "}
         <Link to="/login" className="text-red-400 hover:text-red-300">
-          {t("auth.loginLink")}
+          Войдите
         </Link>
       </p>
     </section>

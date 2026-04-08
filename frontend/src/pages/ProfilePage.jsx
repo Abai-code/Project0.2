@@ -1,9 +1,8 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Navigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import client from "../api/client";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { useTranslation } from "react-i18next";
 
 function Avatar({ username }) {
   const initials = username ? username.slice(0, 2).toUpperCase() : "??";
@@ -14,7 +13,7 @@ function Avatar({ username }) {
   );
 }
 
-function RoleBadge({ role, t }) {
+function RoleBadge({ role }) {
   const isAdmin = role === "admin";
   return (
     <span
@@ -24,7 +23,7 @@ function RoleBadge({ role, t }) {
           : "bg-slate-700/50 text-slate-400 ring-1 ring-slate-600"
       }`}
     >
-      {isAdmin ? t("profile.adminBadge") : t("profile.userBadge")}
+      {isAdmin ? "Админ" : "Пользователь"}
     </span>
   );
 }
@@ -48,16 +47,15 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const { t } = useTranslation();
 
   useEffect(() => {
     if (!authUser) return;
     client
       .get("/users/me")
       .then((res) => setProfile(res.data))
-      .catch(() => setError(t("profile.loadError") || "Error loading profile"))
+      .catch(() => setError("Ошибка загрузки профиля"))
       .finally(() => setLoading(false));
-  }, [authUser, t]);
+  }, [authUser]);
 
   if (authLoading) return <LoadingSpinner />;
   if (!authUser) return <Navigate to="/login" replace />;
@@ -68,7 +66,7 @@ export default function ProfilePage() {
       <div className="mx-auto max-w-lg rounded-xl border border-red-500/30 bg-red-500/10 p-6 text-center">
         <p className="text-red-400 font-medium">{error}</p>
         <Link to="/" className="mt-4 inline-block text-sm text-slate-400 hover:text-white">
-          {t("profile.backHome")}
+          На главную
         </Link>
       </div>
     );
@@ -84,7 +82,7 @@ export default function ProfilePage() {
             <Avatar username={profile.username} />
             <div className="mb-1 min-w-0">
               <h1 className="truncate text-2xl font-black text-white">{profile.username}</h1>
-              <RoleBadge role={profile.role} t={t} />
+              <RoleBadge role={profile.role} />
             </div>
           </div>
         </div>
@@ -92,17 +90,17 @@ export default function ProfilePage() {
 
       <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 shadow-xl backdrop-blur-sm">
         <h2 className="mb-4 text-sm font-bold uppercase tracking-widest text-slate-500">
-          {t("profile.title")}
+          Данные аккаунта
         </h2>
         <div className="space-y-3">
-          <InfoRow icon="U" label={t("profile.username")} value={profile.username} />
-          <InfoRow icon="@" label={t("profile.email")} value={profile.email} />
+          <InfoRow icon="U" label="Имя пользователя" value={profile.username} />
+          <InfoRow icon="@" label="Email" value={profile.email} />
           <InfoRow
             icon={profile.role === "admin" ? "A" : "R"}
-            label={t("profile.role")}
-            value={profile.role === "admin" ? t("profile.admin") : t("profile.user")}
+            label="Роль"
+            value={profile.role === "admin" ? "Администратор" : "Пользователь"}
           />
-          <InfoRow icon="ID" label={t("profile.id")} value={`#${profile.id}`} />
+          <InfoRow icon="ID" label="ID аккаунта" value={`#${profile.id}`} />
         </div>
       </div>
 
@@ -111,14 +109,14 @@ export default function ProfilePage() {
           to="/"
           className="flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-5 py-2.5 text-sm font-semibold text-slate-300 transition-all hover:border-slate-600 hover:text-white active:scale-95"
         >
-          {t("profile.backHome")}
+          На главную
         </Link>
         {profile.role === "admin" && (
           <Link
             to="/admin"
             className="flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-red-600/20 transition-all hover:bg-red-500 active:scale-95"
           >
-            {t("profile.adminPanel")}
+            Панель админа
           </Link>
         )}
       </div>

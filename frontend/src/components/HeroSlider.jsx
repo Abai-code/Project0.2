@@ -1,18 +1,16 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import client from "../api/client";
-import { useTranslation } from "react-i18next";
 
 export default function HeroSlider() {
   const [current, setCurrent] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [movies, setMovies] = useState([]);
   const navigate = useNavigate();
-  const { t } = useTranslation();
 
   const handleWatch = (movie) => {
     if (!movie.movie_url) {
-      alert(t("watch.noVideo"));
+      alert("Видео недоступно");
       return;
     }
     navigate(`/watch/${movie.id}`);
@@ -66,7 +64,7 @@ export default function HeroSlider() {
     <div className="relative w-full h-[50vh] md:h-[70vh] lg:h-[80vh] overflow-hidden rounded-2xl mb-8 group bg-slate-900 shadow-2xl">
       {movies.map((movie, index) => {
         const isActive = index === current;
-        const displayYear = movie.year || movie.release_date?.slice(0, 4) || t("common.no");
+        const displayYear = movie.year || movie.release_date?.slice(0, 4) || "Нет";
         return (
           <div
             key={movie.id}
@@ -114,13 +112,13 @@ export default function HeroSlider() {
                     className="group/btn flex items-center gap-2 bg-gradient-to-r from-orange-500 to-purple-600 text-white px-8 py-3.5 md:py-4 md:px-10 rounded-full font-bold transition-all shadow-[0_0_20px_rgba(249,115,22,0.3)] hover:shadow-[0_0_35px_rgba(168,85,247,0.5)] hover:-translate-y-1 active:scale-95 text-sm md:text-base"
                   >
                     <svg className="w-5 h-5 fill-current transition-transform group-hover/btn:scale-110" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    {t("movie.watch")}
+                    Смотреть
                   </button>
                   <button 
                     onClick={() => navigate(`/movies/${movie.id}`)}
                     className="flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-8 py-3.5 md:py-4 md:px-10 rounded-full font-bold transition-all border border-white/10 hover:border-white/40 hover:-translate-y-1 active:scale-95 text-sm md:text-base"
                   >
-                    {t("movie.about")}
+                    Подробнее
                   </button>
                 </div>
               </div>

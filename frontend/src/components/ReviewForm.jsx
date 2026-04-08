@@ -1,16 +1,14 @@
-﻿import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useState } from "react";
 
 export default function ReviewForm({ onSubmit, loading }) {
   const [text, setText] = useState("");
   const [rating, setRating] = useState(8);
   const [error, setError] = useState("");
-  const { t } = useTranslation();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!text.trim()) {
-      setError(t("reviews.emptyError") || "Review cannot be empty");
+      setError("Отзыв не может быть пустым");
       return;
     }
     setError("");
@@ -20,18 +18,18 @@ export default function ReviewForm({ onSubmit, loading }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3 rounded-xl border border-slate-800 bg-slate-900 p-4">
-      <h3 className="text-lg font-semibold">{t("reviews.addTitle")}</h3>
+      <h3 className="text-lg font-semibold">Добавить отзыв</h3>
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
         className="w-full rounded border border-slate-700 bg-slate-950 p-3 outline-none focus:border-red-500"
         rows={4}
-        placeholder={t("reviews.placeholder")}
-        aria-label={t("reviews.placeholder")}
+        placeholder="Напишите ваши впечатления..."
+        aria-label="Напишите ваши впечатления..."
       />
       <div className="flex items-center gap-3">
         <label htmlFor="rating" className="text-sm text-slate-300">
-          {t("reviews.rating")}:
+          Оценка:
         </label>
         <input
           id="rating"
@@ -41,7 +39,7 @@ export default function ReviewForm({ onSubmit, loading }) {
           value={rating}
           onChange={(e) => setRating(e.target.value)}
           className="w-20 rounded border border-slate-700 bg-slate-950 p-2 outline-none focus:border-red-500"
-          aria-label={t("reviews.rating")}
+          aria-label="Оценка"
         />
       </div>
       {error && <p className="text-sm text-red-400">{error}</p>}
@@ -50,7 +48,7 @@ export default function ReviewForm({ onSubmit, loading }) {
         type="submit"
         className="rounded bg-red-600 px-4 py-2 text-white hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {loading ? t("common.loading") : t("common.submit")}
+        {loading ? "Загрузка..." : "Отправить"}
       </button>
     </form>
   );

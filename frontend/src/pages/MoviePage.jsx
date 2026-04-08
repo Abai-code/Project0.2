@@ -1,11 +1,10 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import client from "../api/client";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ReviewForm from "../components/ReviewForm";
 import ReviewList from "../components/ReviewList";
 import { useAuth } from "../context/AuthContext";
-import { useTranslation } from "react-i18next";
 
 export default function MoviePage({ setToast }) {
   const { id } = useParams();
@@ -15,7 +14,6 @@ export default function MoviePage({ setToast }) {
   const [loading, setLoading] = useState(true);
   const [reviewLoading, setReviewLoading] = useState(false);
   const [error, setError] = useState("");
-  const { t } = useTranslation();
 
   const loadData = async () => {
     try {
@@ -28,7 +26,7 @@ export default function MoviePage({ setToast }) {
       setReviews(reviewsRes.data);
       setError("");
     } catch {
-      setError(t("movie.loadError"));
+      setError("Не удалось загрузить фильм");
     } finally {
       setLoading(false);
     }
@@ -42,10 +40,10 @@ export default function MoviePage({ setToast }) {
     try {
       setReviewLoading(true);
       await client.post("/reviews", { movieId: Number(id), text, rating });
-      setToast({ type: "success", message: t("toast.movieAdded") });
+      setToast({ type: "success", message: "Фильм успешно добавлен" });
       await loadData();
     } catch (e) {
-      setToast({ type: "error", message: e.response?.data?.message || t("reviews.loadError") });
+      setToast({ type: "error", message: e.response?.data?.message || "Ошибка загрузки отзывов" });
     } finally {
       setReviewLoading(false);
     }
@@ -56,7 +54,7 @@ export default function MoviePage({ setToast }) {
       await client.post(`/reviews/${reviewId}/like`);
       await loadData();
     } catch (e) {
-      setToast({ type: "error", message: e.response?.data?.message || t("reviews.loginToReview") });
+      setToast({ type: "error", message: e.response?.data?.message || "Войдите, чтобы оставить отзыв" });
     }
   };
 
@@ -65,7 +63,7 @@ export default function MoviePage({ setToast }) {
   }
 
   if (error || !movie) {
-    return <p className="text-red-400">{error || t("movie.notFound")}</p>;
+    return <p className="text-red-400">{error || "Фильм не найден"}</p>;
   }
 
   return (
@@ -90,29 +88,29 @@ export default function MoviePage({ setToast }) {
                 {movie.rating}
               </span>
               <span className="text-slate-300 dark:text-slate-500">|</span>
-              <span className="text-slate-600 dark:text-slate-300">{movie.year || t("common.no")}</span>
+              <span className="text-slate-600 dark:text-slate-300">{movie.year || "Нет"}</span>
               <span className="text-slate-300 dark:text-slate-500">|</span>
-              <span className="capitalize text-slate-600 dark:text-slate-300">{movie.is_series ? t("movie.series") : t("movie.film")}</span>
+              <span className="capitalize text-slate-600 dark:text-slate-300">{movie.is_series ? "Сериал" : "Фильм"}</span>
             </div>
           </div>
 
           <div className="grid max-w-xl grid-cols-2 gap-x-8 gap-y-4 text-sm">
             <div className="space-y-1">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">{t("movie.year")}</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Год</p>
               <p className="text-slate-800 dark:text-slate-200">{movie.year || "-"}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">{t("movie.country")}</p>
-              <p className="text-slate-800 dark:text-slate-200">{t(`countries.${movie.country?.trim()}`, { defaultValue: movie.country || "-" })}</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Страна</p>
+              <p className="text-slate-800 dark:text-slate-200">{movie.country?.trim() || "-"}</p>
             </div>
             <div className="space-y-1">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">{t("movie.genre")}</p>
-              <p className="text-slate-800 dark:text-slate-200">{t(`genres.${movie.genre?.trim()}`, { defaultValue: movie.genre || "-" })}</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Жанр</p>
+              <p className="text-slate-800 dark:text-slate-200">{movie.genre?.trim() || "-"}</p>
             </div>
           </div>
 
           <div className="space-y-2">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">{t("admin.description")}</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Описание сюжета</p>
             <p className="text-base italic leading-relaxed text-slate-700 dark:text-slate-300">{movie.description}</p>
           </div>
 
@@ -125,14 +123,14 @@ export default function MoviePage({ setToast }) {
                 <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />
                 </svg>
-                {t("movie.watchNow")}
+                Смотреть сейчас
               </Link>
             ) : (
               <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-100 px-6 py-4 text-slate-500 dark:border-slate-700/50 dark:bg-slate-800/50 dark:text-slate-400">
                 <svg className="h-6 w-6 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>{t("watch.noVideo")}</span>
+                <span>Видео недоступно</span>
               </div>
             )}
           </div>
@@ -142,7 +140,7 @@ export default function MoviePage({ setToast }) {
       {user ? (
         <ReviewForm onSubmit={handleSubmitReview} loading={reviewLoading} />
       ) : (
-        <p className="text-slate-500 dark:text-slate-400">{t("reviews.loginToReview")}</p>
+        <p className="text-slate-500 dark:text-slate-400">Войдите, чтобы оставить отзыв</p>
       )}
 
       <ReviewList reviews={reviews} onLike={handleLike} canLike={Boolean(user)} />

@@ -1,15 +1,13 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import client from "../api/client";
-import { useTranslation } from "react-i18next";
 
 export default function MovieCard({ movie }) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isFavorited, setIsFavorited] = useState(movie.is_favorite);
   const [isLiking, setIsLiking] = useState(false);
-  const { t } = useTranslation();
 
   const handleToggleFavorite = async (e) => {
     e.preventDefault();
@@ -75,22 +73,22 @@ export default function MovieCard({ movie }) {
         <div className="flex flex-col gap-2 pt-1">
           <div className="flex items-center justify-between">
             <span className="rounded bg-slate-800 px-2 py-1 text-xs text-yellow-500 font-bold">
-              Rating: {movie.rating || 0}
+              Рейтинг: {movie.rating || 0}
             </span>
-            <span className="text-xs text-slate-500">{movie.year || t("common.no")}</span>
+            <span className="text-xs text-slate-500">{movie.year || "Нет"}</span>
           </div>
           <div className="flex gap-2">
             <Link
               to={`/watch/${movie.id}`}
               className="flex-1 rounded bg-red-600 px-3 py-2 text-center text-xs font-bold text-white hover:bg-red-500 transition-colors"
             >
-              {t("movie.watch")}
+              Смотреть
             </Link>
             <Link
               to={`/movies/${movie.id}`}
               className="flex-1 rounded bg-slate-800 px-3 py-2 text-center text-xs font-bold text-slate-200 hover:bg-slate-700 transition-colors border border-slate-700"
             >
-              {t("movie.about")}
+              О фильме
             </Link>
           </div>
         </div>

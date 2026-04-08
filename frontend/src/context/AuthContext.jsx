@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import client from "../api/client";
-import { useTranslation } from "react-i18next";
 
 const AuthContext = createContext(null);
 
@@ -47,9 +46,8 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  const { t } = useTranslation();
   if (!context) {
-    throw new Error(t("auth.contextError") || "useAuth must be used within an AuthProvider");
+    throw new Error("useAuth должен использоваться внутри AuthProvider");
   }
   return context;
 }

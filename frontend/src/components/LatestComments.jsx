@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
 import client from "../api/client";
 import { useTheme } from "../context/ThemeContext";
-import { useTranslation } from "react-i18next";
 
 export default function LatestComments() {
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const { theme } = useTheme();
-  const { t } = useTranslation();
 
   const fetchComments = async () => {
     try {
@@ -37,7 +35,7 @@ export default function LatestComments() {
   if (loading && comments.length === 0) {
     return (
       <div className="rounded-xl border border-slate-200 bg-white p-4 transition-colors duration-300 dark:border-slate-800 dark:bg-slate-900">
-        <h2 className="mb-4 bg-gradient-to-r from-orange-400 to-purple-500 bg-clip-text text-xl font-bold text-transparent text-center">{t("latestComments.title")}</h2>
+        <h2 className="mb-4 bg-gradient-to-r from-orange-400 to-purple-500 bg-clip-text text-xl font-bold text-transparent text-center">Свежие отзывы</h2>
         <div className="flex justify-center p-4">
           <div className="h-6 w-6 animate-spin rounded-full border-t-2 border-orange-500"></div>
         </div>
@@ -47,14 +45,14 @@ export default function LatestComments() {
 
   return (
     <div className="sticky top-6 rounded-xl border border-slate-200 bg-white p-4 shadow-md transition-colors duration-300 dark:border-slate-800 dark:bg-slate-900 dark:shadow-xl">
-      <h2 className="mb-4 bg-gradient-to-r from-orange-400 to-purple-500 bg-clip-text text-xl font-bold text-transparent text-center" title={t("latestComments.pollingRate")}>
-        {t("latestComments.title")}
+      <h2 className="mb-4 bg-gradient-to-r from-orange-400 to-purple-500 bg-clip-text text-xl font-bold text-transparent text-center" title="Обновляется каждые 10 секунд">
+        Свежие отзывы
       </h2>
       
       {error && comments.length === 0 ? (
-        <p className="text-center text-sm text-red-500 dark:text-red-400">{t("latestComments.loadError")}</p>
+        <p className="text-center text-sm text-red-500 dark:text-red-400">Ошибка загрузки комментариев</p>
       ) : comments.length === 0 ? (
-        <p className="text-center text-sm text-slate-500 dark:text-slate-400">{t("latestComments.noComments")}</p>
+        <p className="text-center text-sm text-slate-500 dark:text-slate-400">Пока нет новых комментариев</p>
       ) : (
         <div className="space-y-4">
           {comments.map((comment) => (

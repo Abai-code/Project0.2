@@ -1,4 +1,4 @@
-﻿require("dotenv").config();
+require("dotenv").config();
 
 const cors = require("cors");
 const express = require("express");
@@ -22,12 +22,12 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 
-const uploadsDir = path.join(__dirname, "uploads/videos");
+const uploadsDir = path.join(__dirname, "..", "uploads/videos");
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 
 async function initDb() {
   try {
