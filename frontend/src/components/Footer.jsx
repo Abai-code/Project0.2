@@ -1,55 +1,57 @@
 import { useTheme } from "../context/ThemeContext";
 
+import { Link } from "react-router-dom";
+
 export default function Footer() {
-  const { theme } = useTheme();
-
   return (
-    <footer className="mt-12 border-t border-slate-200 bg-white py-12 text-slate-600 transition-colors duration-300 dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-400">
-      <div className="mx-auto max-w-6xl px-4">
-        {/* SEO Header Block */}
-        <div className="mb-8">
-          <h2 className="mb-4 text-2xl font-bold text-slate-900 dark:text-slate-100">
-            MovieHub - фильмы и сериалы онлайн
-          </h2>
-          <p className="leading-relaxed">
-            Рады приветствовать на сайте MovieHub всех любителей интересного и качественного кино! Вы любите кинематограф так же как мы? Постоянно следите за выходом новинок? Не проходит ни одного вечера, чтобы вы не посмотрели пару-тройку фильмов?
-            <br className="mb-2" />
-            Тогда вы пришли точно по адресу! В нашем кинотеатре можно смотреть фильмы онлайн бесплатно и без каких-либо ограничений!
-          </p>
-        </div>
+    <footer className="relative mt-20 border-t border-white/5 bg-slate-950/80 pt-16 pb-8 backdrop-blur-xl">
+      <div className="mx-auto max-w-7xl px-4 md:px-6">
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-12">
+          {/* Brand & Mission */}
+          <div className="space-y-6 md:col-span-4">
+            <Link to="/" className="flex items-center gap-2">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-600 shadow-lg shadow-red-600/20">
+                <svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18 3v2h-2V3H8v2H6V3H4v18h2v-2h2v2h8v-2h2v2h2V3h-2z" />
+                </svg>
+              </div>
+              <span className="text-xl font-black text-white">MOVIEHUB</span>
+            </Link>
+            <p className="max-w-xs text-sm leading-relaxed text-slate-400">
+              Ваш персональный путеводитель в мире кино. Смотрите лучшие новинки и классику мирового кинематографа в высоком качестве.
+            </p>
+          </div>
 
-        {/* Main SEO Content with Mascot */}
-        <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-12">
-          <div className="flex justify-center md:col-span-3">
-            <div className="rounded-2xl bg-slate-100 p-1 shadow-xl shadow-slate-200 transition-transform hover:scale-105 dark:bg-slate-800 dark:shadow-none">
-              <img
-                src="/mascot.jpg"
-                alt="Mascot"
-                className="h-56 w-56 rounded-xl object-cover"
-              />
+          {/* Navigation Links */}
+          <div className="grid grid-cols-2 gap-8 md:col-span-3">
+            <div className="space-y-4">
+              <h4 className="text-xs font-black uppercase tracking-widest text-white">Разделы</h4>
+              <ul className="space-y-2 text-sm text-slate-500">
+                <li><Link to="/" className="hover:text-red-500 transition-colors">Главная</Link></li>
+                <li><Link to="/favorites" className="hover:text-red-500 transition-colors">Избранное</Link></li>
+                <li><Link to="/profile" className="hover:text-red-500 transition-colors">Личный кабинет</Link></li>
+              </ul>
             </div>
           </div>
 
-          <div className="space-y-4 md:col-span-9">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Лучшая коллекция</h3>
-            <p>
-              Специально для наших уважаемых пользователей мы постарались собрать лучшую коллекцию фильмов различных жанров, времен и народов! Команда проекта постоянно следит за выходом фильмов в прокат и регулярно добавляет картины, чтобы вы могли одними из первых наслаждаться как лучшими мировыми шедеврами, так и новинками кино совершенно бесплатно!
-            </p>
-            <p>
-              У нас вы найдете лучшие фильмы «Золотой эпохи» Голливуда, классическое европейское кино, лучшие французские комедии, азиатское кино, советские картины и современные хиты различных лет.
-            </p>
-            <p>
-              Мы собрали внушительную коллекцию боевиков и триллеров, фэнтези и фантастики, драм и мелодрам, здесь же вы найдете комедии, ужасы, приключенческие и исторические ленты.
-            </p>
-            <p>
-              Специально для вашего удобства на сайте действует поисковая строка, благодаря которой можно быстро отыскать нужный фильм. Мы стараемся удовлетворять запросы широкого круга зрителей, поэтому оперативно добавляем новые фильмы практически сразу после их выхода в прокат.
-            </p>
-            <p className="font-medium text-slate-900 dark:text-slate-200 italic">
-              Наш кинотеатр готов стать верным партнером и помощником в мире кино!
-            </p>
+          {/* SEO Highlight */}
+          <div className="space-y-4 md:col-span-5">
+            <h4 className="text-xs font-black uppercase tracking-widest text-white">MovieHub - кино онлайн</h4>
+            <div className="space-y-3 text-[13px] leading-relaxed text-slate-500">
+              <p>
+                Рады приветствовать на сайте MovieHub всех любителей качественного кино! У нас вы найдете классику Голливуда, европейское кино, азиатские новинки и современные хиты.
+              </p>
+              <p>
+                Наша коллекция регулярно обновляется. Мы следим за всеми новинками проката, чтобы вы могли наслаждаться просмотром одними из первых.
+              </p>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Background decoration */}
+      <div className="absolute bottom-0 right-0 -z-10 h-64 w-64 rounded-full bg-red-600/5 blur-[120px]" />
     </footer>
   );
 }
+

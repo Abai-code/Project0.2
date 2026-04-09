@@ -44,28 +44,43 @@ export default function LatestComments() {
   }
 
   return (
-    <div className="sticky top-6 rounded-xl border border-slate-200 bg-white p-4 shadow-md transition-colors duration-300 dark:border-slate-800 dark:bg-slate-900 dark:shadow-xl">
-      <h2 className="mb-4 bg-gradient-to-r from-orange-400 to-purple-500 bg-clip-text text-xl font-bold text-transparent text-center" title="Обновляется каждые 10 секунд">
-        Свежие отзывы
-      </h2>
+    <div className="sticky top-24 rounded-2xl bg-slate-900/50 p-6 shadow-xl ring-1 ring-white/5 backdrop-blur-sm">
+      <div className="mb-6 space-y-1">
+        <h2 className="text-xl font-black text-white">Свежие отзывы</h2>
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Обновляется в реальном времени</p>
+      </div>
       
       {error && comments.length === 0 ? (
-        <p className="text-center text-sm text-red-500 dark:text-red-400">Ошибка загрузки комментариев</p>
+        <div className="rounded-xl bg-red-500/5 p-4 text-center ring-1 ring-red-500/20">
+          <p className="text-xs font-bold text-red-400">Ошибка загрузки</p>
+        </div>
       ) : comments.length === 0 ? (
-        <p className="text-center text-sm text-slate-500 dark:text-slate-400">Пока нет новых комментариев</p>
+        <p className="py-8 text-center text-sm italic text-slate-600">Пока нет новых отзывов...</p>
       ) : (
         <div className="space-y-4">
           {comments.map((comment) => (
-            <div key={comment.id} className="rounded-lg border border-gray-100 bg-gray-50 p-3 shadow-inner shadow-gray-200/50 transition-all hover:scale-[1.02] hover:border-gray-200 hover:bg-white dark:border-slate-800 dark:bg-slate-950 dark:shadow-none dark:hover:border-slate-700">
-              <div className="mb-2 flex items-center justify-between">
-                <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{comment.userName}</span>
+            <div 
+              key={comment.id} 
+              className="group relative rounded-xl bg-slate-950/40 p-4 transition-all hover:bg-slate-950/80 hover:ring-1 hover:ring-white/10"
+            >
+              <div className="mb-3 flex items-center gap-2">
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-600/20 text-[10px] font-black text-red-500 ring-1 ring-red-500/30">
+                  {comment.userName?.slice(0, 2).toUpperCase()}
+                </div>
+                <span className="text-xs font-black text-slate-200">{comment.userName}</span>
               </div>
-              <p className="mb-2 text-sm italic leading-relaxed text-slate-600 dark:text-slate-400">
-                "{truncate(comment.text, 90)}"
+              
+              <p className="mb-3 text-[13px] italic leading-relaxed text-slate-400">
+                "{truncate(comment.text, 80)}"
               </p>
-              <div className="mt-2 flex items-center gap-1.5 truncate text-xs font-bold uppercase tracking-tighter text-red-500">
-                <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" /></svg>
-                {comment.movieTitle}
+              
+              <div className="flex items-center gap-2 border-t border-white/5 pt-3">
+                <svg className="h-3 w-3 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M18 3v2h-2V3H8v2H6V3H4v18h2v-2h2v2h8v-2h2v2h2V3h-2z" />
+                </svg>
+                <span className="truncate text-[10px] font-black uppercase tracking-tight text-slate-500 group-hover:text-red-500 transition-colors">
+                  {comment.movieTitle}
+                </span>
               </div>
             </div>
           ))}

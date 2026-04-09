@@ -27,6 +27,11 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
+const avatarsDir = path.join(__dirname, "..", "uploads/avatars");
+if (!fs.existsSync(avatarsDir)) {
+  fs.mkdirSync(avatarsDir, { recursive: true });
+}
+
 app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 
 async function initDb() {
@@ -130,6 +135,11 @@ async function initDb() {
         0
       WHERE NOT EXISTS (SELECT 1 FROM movies WHERE title = 'The Matrix');
     `);
+    // Add avatar_url column if it doesn't exist
+    await db.query(`
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url TEXT;
+    `);
+
     console.log("Database tables checked/created.");
   } catch (err) {
     console.error("Database initialization error:", err);

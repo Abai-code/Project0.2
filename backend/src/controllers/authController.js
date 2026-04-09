@@ -77,7 +77,7 @@ async function login(req, res) {
 async function me(req, res) {
   try {
     const result = await db.query(
-      "SELECT id, username, email, role FROM users WHERE id = $1",
+      "SELECT id, username, email, role, avatar_url FROM users WHERE id = $1",
       [req.user.id]
     );
     if (result.rowCount === 0) {

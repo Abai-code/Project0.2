@@ -41,6 +41,12 @@ export default function HeroSlider() {
   const nextSlide = () => setCurrent((p) => (p === movies.length - 1 ? 0 : p + 1));
   const prevSlide = () => setCurrent((p) => (p === 0 ? movies.length - 1 : p - 1));
 
+  const cleanTitle = (title) => {
+    if (!title) return "";
+    // Remove (Year), с пакетом, and extra spaces
+    return title.replace(/\(\d{4}\)/g, "").replace(/с пакетом/gi, "").replace(/\s+/g, " ").trim();
+  };
+
   if (isLoading) {
     return (
       <div className="relative w-full h-[50vh] md:h-[70vh] lg:h-[80vh] overflow-hidden rounded-2xl mb-8 bg-slate-800/50 animate-pulse flex flex-col justify-end p-6 md:p-12 lg:p-16 border border-slate-700/50">
@@ -70,56 +76,79 @@ export default function HeroSlider() {
             key={movie.id}
             className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${isActive ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
           >
-            {/* Background Image with slow zoom */}
+            {/* Blurred Dark Background */}
             <div 
-              className="absolute inset-0 bg-cover bg-center transition-transform duration-[10000ms] ease-linear"
-              style={{ 
-                backgroundImage: `url(${movie.image})`,
-                transform: isActive ? 'scale(1.05)' : 'scale(1)'
-              }}
-            >
-              {/* Dark gradients, similar to Kinopoisk */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-slate-900/60 to-slate-900/10"></div>
-              <div className="absolute inset-0 bg-gradient-to-r from-[#020617] via-slate-900/50 to-transparent"></div>
-            </div>
+              className="absolute inset-0 bg-cover bg-center opacity-30 blur-2xl transition-transform duration-[10000ms] ease-linear scale-110"
+              style={{ backgroundImage: `url(${movie.image})` }}
+            />
+            {/* Gradient Overlays for smooth text blending */}
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent z-0"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent z-0"></div>
 
-            {/* Content */}
-            <div className="absolute bottom-0 left-0 w-full p-6 md:p-12 lg:p-16 lg:w-3/4 xl:w-2/3 flex flex-col justify-end h-full">
-              <div className={`transition-all duration-700 delay-300 ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+            {/* Content Container */}
+            <div className="absolute inset-0 w-full h-full flex items-center justify-between px-6 md:px-12 lg:px-20 z-10">
+              
+              {/* Left Side: Text Content */}
+              <div className={`w-full lg:w-[55%] flex flex-col justify-end lg:justify-center h-full pb-12 lg:pb-0 transition-all duration-700 delay-300 ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
+
                 
-                <div className="flex items-center gap-3 mb-4 text-sm md:text-base font-bold">
+                {/* Meta badges */}
+                <div className="flex items-center gap-3 mb-6 flex-wrap">
                   {movie.rating > 0 && (
-                    <span className="bg-gradient-to-r from-orange-500 to-purple-600 text-white px-3 py-1 rounded-md shadow-[0_0_15px_rgba(249,115,22,0.4)]">
+                    <span className="bg-red-600 text-white text-xs font-black px-3 py-1.5 rounded-lg shadow-lg shadow-red-600/20">
                       ★ {movie.rating}
                     </span>
                   )}
-                  <span className="text-slate-300 font-medium bg-white/10 px-3 py-1 rounded-md backdrop-blur-md border border-white/5">
-                    {displayYear}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-slate-100 text-xs font-bold bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-md border border-white/5 uppercase tracking-wider">
+                      {displayYear}
+                    </span>
+                    <span className="text-slate-100 text-xs font-bold bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-md border border-white/5 uppercase tracking-wider">
+                      {movie.genre || "Кино"}
+                    </span>
+                  </div>
                 </div>
                 
-                <h2 className="text-4xl md:text-5xl lg:text-7xl font-extrabold text-white mb-4 leading-tight drop-shadow-lg tracking-tight">
-                  {movie.title}
+                {/* Title — responsive & cleanup */}
+                <h2
+                  className="text-3xl md:text-5xl lg:text-6xl font-black text-white mb-6 leading-[1.05] tracking-tight group-hover:text-red-500 transition-colors duration-500"
+                  style={{ textShadow: '0 4px 30px rgba(0,0,0,0.8)' }}
+                >
+                  {cleanTitle(movie.title)}
                 </h2>
                 
-                <p className="text-slate-300 text-sm md:text-lg mb-8 line-clamp-3 md:line-clamp-none drop-shadow-md lg:pr-20 max-w-3xl">
+                {/* Description — slightly bigger & better line height */}
+                <p className="text-slate-300 text-sm md:text-lg leading-relaxed mb-10 line-clamp-3 drop-shadow-lg max-w-xl opacity-90">
                   {movie.description}
                 </p>
 
-                <div className="flex flex-wrap items-center gap-4">
+                {/* Buttons — prominent with glow */}
+                <div className="flex flex-wrap items-center gap-5">
                   <button 
                     onClick={() => handleWatch(movie)}
-                    className="group/btn flex items-center gap-2 bg-gradient-to-r from-orange-500 to-purple-600 text-white px-8 py-3.5 md:py-4 md:px-10 rounded-full font-bold transition-all shadow-[0_0_20px_rgba(249,115,22,0.3)] hover:shadow-[0_0_35px_rgba(168,85,247,0.5)] hover:-translate-y-1 active:scale-95 text-sm md:text-base"
+                    className="group/btn flex items-center gap-3 bg-red-600 text-white px-8 py-4 md:px-12 rounded-2xl font-black transition-all duration-300 shadow-xl shadow-red-600/20 hover:bg-red-500 hover:scale-105 active:scale-95 text-sm md:text-base border border-red-500/50"
                   >
-                    <svg className="w-5 h-5 fill-current transition-transform group-hover/btn:scale-110" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    <svg className="w-5 h-5 fill-current transition-transform duration-300 group-hover/btn:scale-125 shadow-black" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                     Смотреть
                   </button>
                   <button 
                     onClick={() => navigate(`/movies/${movie.id}`)}
-                    className="flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-8 py-3.5 md:py-4 md:px-10 rounded-full font-bold transition-all border border-white/10 hover:border-white/40 hover:-translate-y-1 active:scale-95 text-sm md:text-base"
+                    className="flex items-center gap-2 bg-slate-900/40 hover:bg-slate-900/60 backdrop-blur-xl text-white px-8 py-4 md:px-10 rounded-2xl font-bold transition-all duration-300 border border-white/10 hover:border-white/30 hover:scale-105 active:scale-95 text-sm md:text-base"
                   >
-                    Подробнее
+                    Инфо
                   </button>
+                </div>
+              </div>
+
+              {/* Right Side: Uncropped Poster Frame (visible on large screens) */}
+              <div className={`hidden lg:flex w-[40%] h-[75%] items-center justify-end transition-all duration-1000 delay-500 ${isActive ? 'translate-x-0 opacity-100' : 'translate-x-12 opacity-0'}`}>
+                <div className="relative h-full aspect-[2/3] rounded-3xl overflow-hidden shadow-2xl shadow-black/80 ring-1 ring-white/10 transition-transform duration-[10000ms] ease-linear group-hover:scale-105">
+                  <img 
+                    src={movie.image} 
+                    className="w-full h-full object-cover" 
+                    alt={movie.title} 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
                 </div>
               </div>
             </div>

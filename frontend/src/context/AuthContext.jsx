@@ -30,13 +30,18 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  const updateUser = (data) => {
+    setUser((prev) => (prev ? { ...prev, ...data } : prev));
+  };
+
   const value = useMemo(
     () => ({
       user,
       loading,
       isAdmin: user?.role === "admin",
       login,
-      logout
+      logout,
+      updateUser
     }),
     [user, loading]
   );
