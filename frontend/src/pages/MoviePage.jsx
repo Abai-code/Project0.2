@@ -130,7 +130,7 @@ export default function MoviePage({ setToast }) {
               </div>
               <div className="space-y-1.5">
                 <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Рейтинг</p>
-                <p className="text-base font-semibold text-slate-200">Kinopoisk {movie.rating || "0.0"}</p>
+                <p className="text-base font-semibold text-slate-200">{movie.rating || "0.0"}</p>
               </div>
             </div>
 

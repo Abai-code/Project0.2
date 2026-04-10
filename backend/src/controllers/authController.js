@@ -11,6 +11,14 @@ async function register(req, res) {
     }
 
     const { username, email, password } = req.body;
+    
+    const usernameRegex = /^(?=.*[a-zA-Z])[a-zA-Z0-9]{3,20}$/;
+    if (!usernameRegex.test(username)) {
+      return res.status(400).json({
+        message: "Имя пользователя не может состоять только из цифр",
+      });
+    }
+
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()\-_=+]).{8,}$/;
     if (!passwordRegex.test(password)) {
       return res.status(400).json({

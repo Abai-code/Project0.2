@@ -47,6 +47,18 @@ export default function RegisterPage({ setToast }) {
       setError("Заполните все поля");
       return;
     }
+
+    if (form.username.length < 3) {
+      setError("Имя пользователя должно содержать минимум 3 символа");
+      return;
+    }
+
+    const usernameRegex = /^(?=.*[a-zA-Z])[a-zA-Z0-9]{3,20}$/;
+    if (!usernameRegex.test(form.username)) {
+      setError("Имя пользователя не может состоять только из цифр");
+      return;
+    }
+
     if (!allPassed) {
       setError("Пароль не соответствует требованиям безопасности");
       return;
